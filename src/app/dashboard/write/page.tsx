@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 
-import { PenLine, Upload, LoaderCircle, Check } from "lucide-react";
+import { PenLine, Upload, LoaderCircle, Check, ShieldX } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -48,7 +48,7 @@ const formSchema = z.object({
   title: z.string().min(2).max(100),
   description: z.string().min(2).max(300),
   // category: z.string(),
-  status: z.enum(["archive", "published", "unpublished"]),
+  status: z.enum(["ARCHIVE", "PUBLISHED", "UNPUBLISHED"]),
   // content: z.string().min(1),
 });
 
@@ -58,7 +58,7 @@ export default function Write() {
     defaultValues: {
       title: "",
       description: "",
-      status: "archive",
+      status: "ARCHIVE",
       // content: "",
     },
   });
@@ -71,6 +71,8 @@ export default function Write() {
   const createArticle = api.article.create.useMutation({
     onSuccess: () => {
       setSubmitStatus(false);
+      form.reset();
+      setArticleContent("");
       toast({
         description: (
           <div className="flex space-x-2">
@@ -80,12 +82,24 @@ export default function Write() {
         ),
       });
     },
+    onError: (err) => {
+      setSubmitStatus(false);
+      console.log(err);
+      toast({
+        description: (
+          <div className="flex space-x-2">
+            <ShieldX className="h-6 w-6 text-red-600" />
+            <span>create article is failed! Please check your input</span>
+          </div>
+        ),
+      });
+    },
   });
 
   const onSubmit = (data: formDataType) => {
     setSubmitStatus(true);
-    const { title } = data;
-    createArticle.mutate({ title, content: articleContent });
+    const { title, status } = data;
+    createArticle.mutate({ title, content: articleContent, status });
   };
   return (
     <main className="grid flex-1 items-start gap-4  md:gap-8">
@@ -300,13 +314,13 @@ export default function Write() {
                                   </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
-                                  <SelectItem value="archive">
+                                  <SelectItem value="ARCHIVE">
                                     Archive
                                   </SelectItem>
-                                  <SelectItem value="published">
+                                  <SelectItem value="PUBLISHED">
                                     Published
                                   </SelectItem>
-                                  <SelectItem value="unpublished">
+                                  <SelectItem value="UNPUBLISHED">
                                     Unpublished
                                   </SelectItem>
                                 </SelectContent>

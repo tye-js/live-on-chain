@@ -1,6 +1,8 @@
 "use client";
 import Image from "next/image";
 
+import Link from "next/link";
+
 import { File, ListFilter, MoreHorizontal, PlusCircle } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -43,7 +45,6 @@ import {
 } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { api } from "@/trpc/react";
-import Link from "next/link";
 import { useState } from "react";
 
 export default function Dashboard() {
@@ -130,10 +131,20 @@ export default function Dashboard() {
                         />
                       </TableCell>
                       <TableCell className="font-medium">
-                        {article.title}
+                        <Link href={`/blog/${article.slug_name}`}>
+                          {article.title}
+                        </Link>
                       </TableCell>
                       <TableCell>
-                        <Badge variant="outline">Draft</Badge>
+                        {article.status === "UNPUBLISHED" && (
+                          <Badge variant="secondary">Unpublished</Badge>
+                        )}
+                        {article.status === "ARCHIVE" && (
+                          <Badge variant="outline">Archived</Badge>
+                        )}
+                        {article.status === "PUBLISHED" && (
+                          <Badge variant="default">Published</Badge>
+                        )}
                       </TableCell>
 
                       <TableCell className="hidden md:table-cell">25</TableCell>
