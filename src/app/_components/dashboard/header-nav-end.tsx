@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 import SheetMenu from "./sheet-menu";
 import { Input } from "@/components/ui/input";
@@ -6,7 +7,6 @@ import {
   BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbList,
-  BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import Image from "next/image";
@@ -23,28 +23,34 @@ import {
 
 import Link from "next/link";
 import { Search } from "lucide-react";
+import { usePathname } from "next/navigation";
 
 const HeaderNavEnd = () => {
+  const pathName = usePathname();
+  const pathNameArray = pathName?.split("/").filter((item) => item !== "");
+  console.log(pathNameArray);
   return (
     <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
       <SheetMenu></SheetMenu>
       <Breadcrumb className="hidden md:flex">
         <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbLink asChild>
-              <Link href="#">Dashboard</Link>
-            </BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbLink asChild>
-              <Link href="#">Products</Link>
-            </BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbPage>All Products</BreadcrumbPage>
-          </BreadcrumbItem>
+          {pathNameArray?.map((item, index) => (
+            <div
+              className="flex flex-wrap items-center gap-1.5 break-words text-sm text-muted-foreground sm:gap-2.5"
+              key={index}
+            >
+              <BreadcrumbItem>
+                <BreadcrumbLink asChild>
+                  <Link href={`/${item}`}>
+                    {item.charAt(0).toUpperCase() + item.slice(1)}
+                  </Link>
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator
+                className={index === pathNameArray.length - 1 ? "hidden" : ""}
+              />
+            </div>
+          ))}
         </BreadcrumbList>
       </Breadcrumb>
       <div className="relative ml-auto flex-1 md:grow-0">

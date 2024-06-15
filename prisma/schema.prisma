@@ -41,6 +41,7 @@ model Article {
   title     String  @unique
   published Boolean  @default(false)
   slug_name String  @unique
+  description String
   content   String
   status    EnumStatus
   createdAt DateTime @default(now())

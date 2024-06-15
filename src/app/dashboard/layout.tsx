@@ -18,7 +18,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${GeistSans.variable}`}>
       <body>
-        <NextTopLoader />
+        <NextTopLoader showSpinner={false} height={2} />
         <TRPCReactProvider>
           <div className="flex min-h-screen w-full flex-col bg-muted/40">
             <AsideNav></AsideNav>

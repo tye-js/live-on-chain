@@ -46,9 +46,9 @@ type formDataType = z.infer<typeof formSchema>;
 
 const formSchema = z.object({
   title: z.string().min(2).max(100),
-  description: z.string().min(2).max(300),
+  description: z.string().min(2).max(500),
   // category: z.string(),
-  status: z.enum(["ARCHIVE", "PUBLISHED", "UNPUBLISHED"]),
+  status: z.enum(["ARCHIVE", "PUBLISHED", "UNPUBLISHED"]).default("ARCHIVE"),
   // content: z.string().min(1),
 });
 
@@ -67,12 +67,15 @@ export default function Write() {
   const onChangeContents = (data: string) => {
     setArticleContent(data);
   };
+
   const [submitStatus, setSubmitStatus] = useState(false);
   const createArticle = api.article.create.useMutation({
     onSuccess: () => {
       setSubmitStatus(false);
       form.reset();
       setArticleContent("");
+
+      console.log(articleContent);
       toast({
         description: (
           <div className="flex space-x-2">
@@ -98,8 +101,13 @@ export default function Write() {
 
   const onSubmit = (data: formDataType) => {
     setSubmitStatus(true);
-    const { title, status } = data;
-    createArticle.mutate({ title, content: articleContent, status });
+    const { title, status, description } = data;
+    createArticle.mutate({
+      title,
+      content: articleContent,
+      status,
+      description,
+    });
   };
   return (
     <main className="grid flex-1 items-start gap-4  md:gap-8">
@@ -150,9 +158,6 @@ export default function Write() {
                 <Card x-chunk="dashboard-07-chunk-0">
                   <CardHeader>
                     <CardTitle>Article Details</CardTitle>
-                    <CardDescription>
-                      Lipsum dolor sit amet, consectetur adipiscing elit
-                    </CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="grid gap-6">

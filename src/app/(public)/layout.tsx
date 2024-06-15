@@ -10,7 +10,10 @@ import Footer from "../_components/footer";
 import NextTopLoader from "nextjs-toploader";
 
 export const metadata = {
-  title: "LiveOnChain",
+  title: {
+    template: "%s | LiveOnChain",
+    default: "LiveOnChain",
+  },
   description: "Live on blockchain",
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
@@ -27,7 +30,7 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body>
-        <NextTopLoader />
+        <NextTopLoader showSpinner={false} height={2} />
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

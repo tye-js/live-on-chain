@@ -1,23 +1,23 @@
+import { api } from "@/trpc/server";
 import React from "react";
+import Link from "next/link";
+import Image from "next/image";
 
-const BlogPage = () => {
+const BlogPage = async () => {
+  const data = await api.article.getAllPublished({ page: 0 });
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 md:gap-8 lg:grid-cols-4">
-      {Array.from(Array(20)).map((_, i) => (
-        <div className="" key={i}>
-          <div className="flex h-32 items-center justify-center overflow-hidden rounded-sm bg-gray-500 text-center ">
-            image
-          </div>
+      {data?.map((article) => (
+        <div className="" key={article.id}>
+          <Link href={`/blog/${article.slug_name}`}>
+            <div className="flex h-32 items-center justify-center overflow-hidden rounded-sm bg-gray-500 text-center ">
+              Image
+            </div>
+          </Link>
           <h2 className=" text-xl font-semibold">
-            Lorem ipsum dolor, sit amet consectetur adipisicing elit. Quas,
-            numquam!
+            <Link href={`/blog/${article.slug_name}`}>{article.title}</Link>
           </h2>
-          <p className="text-sm font-light">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Corporis
-            quo quae ducimus, ratione quaerat esse? Rerum est assumenda
-            recusandae deserunt veniam quaerat, enim distinctio ab officia, aut
-            soluta corporis beatae.
-          </p>
+          <p className="text-sm font-light">{article.description}</p>
         </div>
       ))}
     </div>

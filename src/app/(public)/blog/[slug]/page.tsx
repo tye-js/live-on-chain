@@ -1,11 +1,31 @@
 import { api } from "@/trpc/server";
 import Image from "next/image";
 import React from "react";
+import type { Metadata } from "next";
 
-const Blog = async ({ params }: { params: { slug: string } }) => {
+type Props = {
+  params: { slug: string };
+};
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  // fetch data
+  const data = await api.article.getOne({ slug_name: params.slug });
+
+  // optionally access and extend (rather than replace) parent metadata
+  // const previousImages = (await parent).openGraph?.images || [];
+
+  return {
+    title: data?.title,
+    description: data?.description,
+    // openGraph: {
+    //   images: ["/some-specific-page-image.jpg", ...previousImages],
+    // },
+  };
+}
+const Blog = async ({ params }: Props) => {
   const data = await api.article.getOne({ slug_name: params.slug });
   return (
-    <article className="prose lg:prose-xl font-serif">
+    <article className="prose  lg:prose-lg prose-a:font-light prose-a:text-blue-500">
       <h1>{data?.title}</h1>
       <div className="flex h-6 items-center justify-between px-4 text-center">
         <p>{data?.createdAt.toDateString()}</p>
@@ -24,7 +44,9 @@ const Blog = async ({ params }: { params: { slug: string } }) => {
         </span>
       </div>
       {data?.content && (
-        <div dangerouslySetInnerHTML={{ __html: data?.content }}></div>
+        <div className="font-light">
+          <div dangerouslySetInnerHTML={{ __html: data?.content }}></div>
+        </div>
       )}
     </article>
   );

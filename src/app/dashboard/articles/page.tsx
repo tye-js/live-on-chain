@@ -3,9 +3,15 @@ import Image from "next/image";
 
 import Link from "next/link";
 
-import { File, ListFilter, MoreHorizontal, PlusCircle } from "lucide-react";
+import {
+  ListFilter,
+  MoreHorizontal,
+  PlusCircle,
+  LoaderCircle,
+} from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -17,14 +23,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -46,24 +45,72 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { api } from "@/trpc/react";
 import { useState } from "react";
+import { type EnumStatus } from "@prisma/client";
+import { usePathname } from "next/navigation";
 
-export default function Dashboard() {
+type ArticleStatus = EnumStatus | "ALL";
+// type ArticleDataType = {
+//   id: number;
+//   title: string;
+//   published: boolean;
+//   slug_name: string;
+//   description: string;
+//   content: string;
+//   status: EnumStatus;
+//   createdAt: Date;
+//   updatedAt: Date;
+//   createdById: string;
+// }[];
+export default function Articles() {
   const [page, setPage] = useState(0);
-  const data = api.article.getAll.useQuery({ page });
+  const [status, setStatus] = useState<ArticleStatus>("ALL");
 
-  // const session = useSession();
-  // console.log(session);
+  const pathName = usePathname();
+
+  const count = api.article.getAllCount.useQuery({ status });
+  const data = api.article.getAll.useQuery({ page, status });
+  const handelClickTabs = (status: ArticleStatus) => {
+    setStatus(status);
+  };
   return (
     <main className="grid flex-1 items-start gap-4  md:gap-8">
-      <Tabs defaultValue="all">
+      <Tabs defaultValue={status}>
         <div className="flex items-center">
           <TabsList>
-            <TabsTrigger value="all">All</TabsTrigger>
-            <TabsTrigger value="active">Active</TabsTrigger>
-            <TabsTrigger value="draft">Draft</TabsTrigger>
-            <TabsTrigger value="archived" className="hidden sm:flex">
-              Archived
-            </TabsTrigger>
+            <Link href={pathName + "?" + `status=ALL`}>
+              <TabsTrigger
+                value="ALL"
+                onClick={() => handelClickTabs("ALL")}
+                disabled={status === "ALL"}
+              >
+                All
+              </TabsTrigger>
+            </Link>
+            <Link href={pathName + "?" + `status=ARCHIVE`}>
+              <TabsTrigger
+                value="ARCHIVE"
+                onClick={() => handelClickTabs("ARCHIVE")}
+              >
+                Archive
+              </TabsTrigger>
+            </Link>
+            <Link href={pathName + "?" + `status=PUBLISHED`}>
+              <TabsTrigger
+                value="PUBLISHED"
+                onClick={() => handelClickTabs("PUBLISHED")}
+              >
+                Published
+              </TabsTrigger>
+            </Link>
+            <Link href={pathName + "?" + `status=UNPUBLISHED`}>
+              <TabsTrigger
+                value="UNPUBLISHED"
+                onClick={() => handelClickTabs("UNPUBLISHED")}
+                className="hidden sm:flex"
+              >
+                Unpublished
+              </TabsTrigger>
+            </Link>
           </TabsList>
           <div className="ml-auto flex items-center gap-2">
             <DropdownMenu>
@@ -79,10 +126,10 @@ export default function Dashboard() {
                 <DropdownMenuLabel>Filter by</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuCheckboxItem checked>
-                  Active
+                  Published
                 </DropdownMenuCheckboxItem>
-                <DropdownMenuCheckboxItem>Draft</DropdownMenuCheckboxItem>
-                <DropdownMenuCheckboxItem>Archived</DropdownMenuCheckboxItem>
+                <DropdownMenuCheckboxItem>Unpublished</DropdownMenuCheckboxItem>
+                <DropdownMenuCheckboxItem>Active</DropdownMenuCheckboxItem>
               </DropdownMenuContent>
             </DropdownMenu>
             <Link href="/dashboard/write">
@@ -95,7 +142,7 @@ export default function Dashboard() {
             </Link>
           </div>
         </div>
-        <TabsContent value="all">
+        <TabsContent value={status}>
           <Card x-chunk="dashboard-06-chunk-0">
             <CardContent>
               <Table>
@@ -119,66 +166,101 @@ export default function Dashboard() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {data.data?.map((article) => (
-                    <TableRow key={article.id}>
-                      <TableCell className="hidden sm:table-cell">
-                        <Image
-                          alt="Product image"
-                          className="aspect-square rounded-md object-cover"
-                          height="64"
-                          src="/logo.svg"
-                          width="64"
-                        />
-                      </TableCell>
-                      <TableCell className="font-medium">
-                        <Link href={`/blog/${article.slug_name}`}>
-                          {article.title}
-                        </Link>
-                      </TableCell>
-                      <TableCell>
-                        {article.status === "UNPUBLISHED" && (
-                          <Badge variant="secondary">Unpublished</Badge>
-                        )}
-                        {article.status === "ARCHIVE" && (
-                          <Badge variant="outline">Archived</Badge>
-                        )}
-                        {article.status === "PUBLISHED" && (
-                          <Badge variant="default">Published</Badge>
-                        )}
-                      </TableCell>
+                  {data.isLoading && (
+                    <>
+                      {Array.from({ length: 10 }).map((_, i) => (
+                        <TableRow key={i}>
+                          <TableCell>
+                            <Skeleton className="h-[64px] w-full rounded-full"></Skeleton>
+                          </TableCell>
+                          <TableCell>
+                            <Skeleton className="h-[40px] w-full rounded-full"></Skeleton>
+                          </TableCell>
+                          <TableCell>
+                            <Skeleton className="h-[40px] w-full rounded-full"></Skeleton>
+                          </TableCell>
+                          <TableCell>
+                            <Skeleton className="h-[40px] w-full rounded-full"></Skeleton>
+                          </TableCell>
+                          <TableCell>
+                            <Skeleton className="h-[40px] w-full rounded-full"></Skeleton>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </>
+                  )}
+                  {data.isSuccess &&
+                    data.data?.map((article) => (
+                      <TableRow key={article.id}>
+                        <TableCell className="hidden sm:table-cell">
+                          <Image
+                            alt="Product image"
+                            className="aspect-square rounded-md object-cover"
+                            height="64"
+                            src="/logo.svg"
+                            width="64"
+                          />
+                        </TableCell>
+                        <TableCell className="font-medium">
+                          <Link href={`/blog/${article.slug_name}`}>
+                            {article.title}
+                          </Link>
+                        </TableCell>
+                        <TableCell>
+                          {article.status === "UNPUBLISHED" && (
+                            <Badge variant="secondary">Unpublished</Badge>
+                          )}
+                          {article.status === "ARCHIVE" && (
+                            <Badge variant="outline">Archived</Badge>
+                          )}
+                          {article.status === "PUBLISHED" && (
+                            <Badge variant="default">Published</Badge>
+                          )}
+                        </TableCell>
 
-                      <TableCell className="hidden md:table-cell">25</TableCell>
-                      <TableCell className="hidden md:table-cell">
-                        {article.createdAt.toLocaleDateString()}
-                      </TableCell>
-                      <TableCell>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              aria-haspopup="true"
-                              size="icon"
-                              variant="ghost"
-                            >
-                              <MoreHorizontal className="h-4 w-4" />
-                              <span className="sr-only">Toggle menu</span>
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                            <DropdownMenuItem>Edit</DropdownMenuItem>
-                            <DropdownMenuItem>Delete</DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                        <TableCell className="hidden md:table-cell">
+                          25
+                        </TableCell>
+                        <TableCell className="hidden md:table-cell">
+                          {article.createdAt.toLocaleDateString()}
+                        </TableCell>
+                        <TableCell>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                aria-haspopup="true"
+                                size="icon"
+                                variant="ghost"
+                              >
+                                <MoreHorizontal className="h-4 w-4" />
+                                <span className="sr-only">Toggle menu</span>
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                              <DropdownMenuItem>Edit</DropdownMenuItem>
+                              <DropdownMenuItem>Delete</DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </TableCell>
+                      </TableRow>
+                    ))}
                 </TableBody>
               </Table>
             </CardContent>
             <CardFooter>
               <div className="text-xs text-muted-foreground">
-                Showing <strong>1-10</strong> of{" "}
-                <strong>{data.data?.length}</strong> products
+                Showing{" "}
+                <strong>
+                  {10 * page}-{(page + 1) * 10}
+                </strong>{" "}
+                of{" "}
+                {count.isLoading ? (
+                  <LoaderCircle className="inline-block h-[14px] w-[14px] animate-spin" />
+                ) : (
+                  count.data
+                )}{" "}
+                products
               </div>
               <Pagination>
                 <PaginationContent>
@@ -186,12 +268,17 @@ export default function Dashboard() {
                     <PaginationPrevious href="#" />
                   </PaginationItem>
                   <PaginationItem>
-                    <Button variant={"ghost"} onClick={() => setPage(0)}>
+                    <PaginationLink
+                      href={pathName + "?" + `page=0`}
+                      onClick={() => setPage(0)}
+                    >
                       1
-                    </Button>
+                    </PaginationLink>
                   </PaginationItem>
                   <PaginationItem>
-                    <Button onClick={() => setPage(1)}>2</Button>
+                    <PaginationLink onClick={() => setPage(1)}>
+                      2
+                    </PaginationLink>
                   </PaginationItem>
                   <PaginationItem>
                     <PaginationLink href="#">3</PaginationLink>
