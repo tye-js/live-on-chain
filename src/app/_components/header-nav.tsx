@@ -6,8 +6,8 @@ import Image from "next/image";
 const HeaderNav = () => {
   return (
     <header className="sticky top-0 z-50 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container  flex h-20 items-center justify-between  font-mono ">
-        <section>
+      <div className="container flex h-20 items-center justify-between font-mono">
+        <section className="hidden md:block">
           <Link href={"/"}>
             <Image src="/logo.svg" alt="Logo" width="32" height="32"></Image>
           </Link>
