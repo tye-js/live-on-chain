@@ -27,7 +27,7 @@ const Blog = async ({ params }: Props) => {
   return (
     <article className="prose  lg:prose-lg prose-a:font-light prose-a:text-blue-500">
       <h1>{data?.title}</h1>
-      <div className="flex h-6 items-center justify-between px-4 text-center">
+      <section className="flex h-6 items-center justify-between px-4 text-center">
         <p>{data?.createdAt.toDateString()}</p>
 
         <span className="flex items-center gap-2">
@@ -42,11 +42,14 @@ const Blog = async ({ params }: Props) => {
           )}
           <span>{data?.createdBy.name}</span>
         </span>
-      </div>
+      </section>
       {data?.content && (
-        <div className="font-light">
-          <div dangerouslySetInnerHTML={{ __html: data?.content }}></div>
-        </div>
+        <article
+          className="font-light"
+          dangerouslySetInnerHTML={{ __html: data?.content }}
+        >
+          {/* <data ></data> */}
+        </article>
       )}
     </article>
   );

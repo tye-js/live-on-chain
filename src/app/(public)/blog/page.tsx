@@ -6,7 +6,7 @@ import Image from "next/image";
 const BlogPage = async () => {
   const data = await api.article.getAllPublished({ page: 0 });
   return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 md:gap-8 lg:grid-cols-4">
+    <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 md:gap-8 lg:grid-cols-4">
       {data?.map((article) => (
         <div className="" key={article.id}>
           <Link href={`/blog/${article.slug_name}`}>
@@ -20,7 +20,7 @@ const BlogPage = async () => {
           <p className="text-sm font-light">{article.description}</p>
         </div>
       ))}
-    </div>
+    </section>
   );
 };
 

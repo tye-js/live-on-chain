@@ -40,7 +40,7 @@ export default function RootLayout({
           <TRPCReactProvider>
             <HeaderNav></HeaderNav>
 
-            <div className="container mt-4">{children}</div>
+            <main className="container mt-4">{children}</main>
             <Footer></Footer>
           </TRPCReactProvider>
         </ThemeProvider>

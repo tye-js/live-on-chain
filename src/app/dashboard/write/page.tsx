@@ -74,8 +74,6 @@ export default function Write() {
       setSubmitStatus(false);
       form.reset();
       setArticleContent("");
-
-      console.log(articleContent);
       toast({
         description: (
           <div className="flex space-x-2">
@@ -109,6 +107,7 @@ export default function Write() {
       description,
     });
   };
+
   return (
     <main className="grid flex-1 items-start gap-4  md:gap-8">
       <Form {...form}>
@@ -152,7 +151,10 @@ export default function Write() {
                     </FormItem>
                   )}
                 /> */}
-                <TextEditor changeContent={onChangeContents} />
+                <TextEditor
+                  contentInitial={articleContent}
+                  changeContent={onChangeContents}
+                />
               </div>
               <div className="col-span-1 grid items-start gap-4 md:col-span-2  lg:gap-8">
                 <Card x-chunk="dashboard-07-chunk-0">

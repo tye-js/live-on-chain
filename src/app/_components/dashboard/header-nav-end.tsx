@@ -28,7 +28,16 @@ import { usePathname } from "next/navigation";
 const HeaderNavEnd = () => {
   const pathName = usePathname();
   const pathNameArray = pathName?.split("/").filter((item) => item !== "");
-  console.log(pathNameArray);
+  const handleBreadcrumbLink = (item: string) => {
+    const index = pathNameArray.indexOf(item);
+
+    if (index === 0) {
+      return item;
+    } else {
+      return pathNameArray.slice(0, index + 1).join("/");
+    }
+  };
+
   return (
     <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
       <SheetMenu></SheetMenu>
@@ -41,7 +50,7 @@ const HeaderNavEnd = () => {
             >
               <BreadcrumbItem>
                 <BreadcrumbLink asChild>
-                  <Link href={`/${item}`}>
+                  <Link href={`/${handleBreadcrumbLink(item)}`}>
                     {item.charAt(0).toUpperCase() + item.slice(1)}
                   </Link>
                 </BreadcrumbLink>

@@ -3,12 +3,7 @@ import Image from "next/image";
 
 import Link from "next/link";
 
-import {
-  ListFilter,
-  MoreHorizontal,
-  PlusCircle,
-  LoaderCircle,
-} from "lucide-react";
+import { MoreHorizontal, PlusCircle, LoaderCircle } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -19,18 +14,15 @@ import {
   PaginationContent,
   PaginationEllipsis,
   PaginationItem,
-  PaginationLink,
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import {
   DropdownMenu,
-  DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
@@ -44,9 +36,8 @@ import {
 } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { api } from "@/trpc/react";
-import { useState } from "react";
 import { type EnumStatus } from "@prisma/client";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 
 type ArticleStatus = EnumStatus | "ALL";
 // type ArticleDataType = {
@@ -61,77 +52,59 @@ type ArticleStatus = EnumStatus | "ALL";
 //   updatedAt: Date;
 //   createdById: string;
 // }[];
+
+function getArticleData(statusParam: ArticleStatus, pageNumber: number) {
+  const count = api.article.getAllCount.useQuery({
+    status: statusParam,
+  });
+  const data = api.article.getAll.useQuery({
+    page: pageNumber - 1,
+    status: statusParam,
+  });
+
+  return { count, data };
+}
 export default function Articles() {
-  const [page, setPage] = useState(0);
-  const [status, setStatus] = useState<ArticleStatus>("ALL");
-
+  const searchParams = useSearchParams();
   const pathName = usePathname();
+  const statusParam = searchParams.get("status") ?? "ALL";
+  const pageNumber =
+    Number(searchParams.get("pageNumber")) === 0
+      ? 1
+      : Number(searchParams.get("pageNumber"));
 
-  const count = api.article.getAllCount.useQuery({ status });
-  const data = api.article.getAll.useQuery({ page, status });
-  const handelClickTabs = (status: ArticleStatus) => {
-    setStatus(status);
+  const { count, data } = getArticleData(
+    statusParam as ArticleStatus,
+    pageNumber,
+  );
+
+  const joinUrl = (status?: ArticleStatus, pageNumber?: number) => {
+    return pathName + "?" + `status=${status}&&pageNumber=${pageNumber}`;
   };
+
   return (
     <main className="grid flex-1 items-start gap-4  md:gap-8">
-      <Tabs defaultValue={status}>
+      <Tabs defaultValue={statusParam}>
         <div className="flex items-center">
           <TabsList>
-            <Link href={pathName + "?" + `status=ALL`}>
-              <TabsTrigger
-                value="ALL"
-                onClick={() => handelClickTabs("ALL")}
-                disabled={status === "ALL"}
-              >
+            <Link href={joinUrl("ALL", 1)}>
+              <TabsTrigger value="ALL" disabled={statusParam === "ALL"}>
                 All
               </TabsTrigger>
             </Link>
-            <Link href={pathName + "?" + `status=ARCHIVE`}>
-              <TabsTrigger
-                value="ARCHIVE"
-                onClick={() => handelClickTabs("ARCHIVE")}
-              >
-                Archive
-              </TabsTrigger>
+            <Link href={joinUrl("ARCHIVE", 1)}>
+              <TabsTrigger value="ARCHIVE">Archive</TabsTrigger>
             </Link>
-            <Link href={pathName + "?" + `status=PUBLISHED`}>
-              <TabsTrigger
-                value="PUBLISHED"
-                onClick={() => handelClickTabs("PUBLISHED")}
-              >
-                Published
-              </TabsTrigger>
+            <Link href={joinUrl("PUBLISHED", 1)}>
+              <TabsTrigger value="PUBLISHED">Published</TabsTrigger>
             </Link>
-            <Link href={pathName + "?" + `status=UNPUBLISHED`}>
-              <TabsTrigger
-                value="UNPUBLISHED"
-                onClick={() => handelClickTabs("UNPUBLISHED")}
-                className="hidden sm:flex"
-              >
+            <Link href={joinUrl("UNPUBLISHED", 1)}>
+              <TabsTrigger value="UNPUBLISHED" className="hidden sm:flex">
                 Unpublished
               </TabsTrigger>
             </Link>
           </TabsList>
           <div className="ml-auto flex items-center gap-2">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="h-7 gap-1">
-                  <ListFilter className="h-3.5 w-3.5" />
-                  <span className="sr-only sm:not-sr-only sm:whitespace-nowrap">
-                    Filter
-                  </span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuLabel>Filter by</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuCheckboxItem checked>
-                  Published
-                </DropdownMenuCheckboxItem>
-                <DropdownMenuCheckboxItem>Unpublished</DropdownMenuCheckboxItem>
-                <DropdownMenuCheckboxItem>Active</DropdownMenuCheckboxItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
             <Link href="/dashboard/write">
               <Button size="sm" className="h-7 gap-1">
                 <PlusCircle className="h-3.5 w-3.5" />
@@ -142,7 +115,7 @@ export default function Articles() {
             </Link>
           </div>
         </div>
-        <TabsContent value={status}>
+        <TabsContent value={statusParam}>
           <Card x-chunk="dashboard-06-chunk-0">
             <CardContent>
               <Table>
@@ -238,8 +211,16 @@ export default function Articles() {
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
                               <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                              <DropdownMenuItem>Edit</DropdownMenuItem>
-                              <DropdownMenuItem>Delete</DropdownMenuItem>
+                              <Link
+                                href={`/dashboard/articles/edit/${article.slug_name}`}
+                              >
+                                <DropdownMenuItem className="hover:cursor-pointer">
+                                  Edit
+                                </DropdownMenuItem>
+                              </Link>
+                              <DropdownMenuItem className="hover:cursor-pointer">
+                                Delete
+                              </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
                         </TableCell>
@@ -252,7 +233,7 @@ export default function Articles() {
               <div className="text-xs text-muted-foreground">
                 Showing{" "}
                 <strong>
-                  {10 * page}-{(page + 1) * 10}
+                  {10 * (pageNumber - 1)}-{pageNumber * 10}
                 </strong>{" "}
                 of{" "}
                 {count.isLoading ? (
@@ -264,31 +245,38 @@ export default function Articles() {
               </div>
               <Pagination>
                 <PaginationContent>
-                  <PaginationItem>
-                    <PaginationPrevious href="#" />
+                  <PaginationItem hidden={pageNumber === 1}>
+                    <PaginationPrevious
+                      href={joinUrl(
+                        statusParam as ArticleStatus,
+                        pageNumber - 1,
+                      )}
+                    />
                   </PaginationItem>
                   <PaginationItem>
-                    <PaginationLink
-                      href={pathName + "?" + `page=0`}
-                      onClick={() => setPage(0)}
-                    >
+                    <Link href={joinUrl(statusParam as ArticleStatus, 1)}>
                       1
-                    </PaginationLink>
+                    </Link>
                   </PaginationItem>
                   <PaginationItem>
-                    <PaginationLink onClick={() => setPage(1)}>
+                    <Link href={joinUrl(statusParam as ArticleStatus, 2)}>
                       2
-                    </PaginationLink>
+                    </Link>
                   </PaginationItem>
-                  <PaginationItem>
-                    <PaginationLink href="#">3</PaginationLink>
-                  </PaginationItem>
+
                   <PaginationItem>
                     <PaginationEllipsis />
                   </PaginationItem>
-                  <PaginationItem>
-                    <PaginationNext href="#" />
-                  </PaginationItem>
+                  {count.data && (
+                    <PaginationItem hidden={pageNumber === count.data / 10}>
+                      <PaginationNext
+                        href={joinUrl(
+                          statusParam as ArticleStatus,
+                          pageNumber + 1,
+                        )}
+                      />
+                    </PaginationItem>
+                  )}
                 </PaginationContent>
               </Pagination>
             </CardFooter>

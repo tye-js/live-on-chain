@@ -55,13 +55,21 @@ const options: SunEditorOptions = {
     ],
   ],
 };
-const TextEditor = (props: { changeContent: (contents: string) => void }) => {
+const TextEditor = (props: {
+  changeContent: (contents: string) => void;
+  contentInitial: string;
+}) => {
   const handleChange = (contents: string) => {
     props.changeContent(contents);
   };
   return (
     <Card className="overflow-hidden">
-      <SunEditor setOptions={options} onChange={handleChange} height="80vh" />
+      <SunEditor
+        setContents={props.contentInitial}
+        setOptions={options}
+        onChange={handleChange}
+        height="80vh"
+      />
     </Card>
   );
 };

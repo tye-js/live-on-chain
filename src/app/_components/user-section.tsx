@@ -11,14 +11,14 @@ const UserSection = async () => {
   return (
     <>
       {session && (
-        <div className="flex items-center space-x-2">
+        <section className="flex items-center space-x-2">
           <Avatar className="h-8 w-8">
             <AvatarImage src={session.user.image!} />
             <AvatarFallback>CN</AvatarFallback>
           </Avatar>
           <div className="font-mono">{session.user.name}</div>
           <SignOut />
-        </div>
+        </section>
       )}
       {!session && <LoginButton />}
     </>
