@@ -36,7 +36,9 @@ const config = {
           "attributes": false
         }
       }
-    ]
+    ],
+    "@typescript-eslint/no-empty-interface": "warn",
+    "@typescript-eslint/prefer-nullish-coalescing": "warn"
   }
 }
 module.exports = config;

@@ -1,7 +1,6 @@
 import { api } from "@/trpc/server";
 import React from "react";
 import Link from "next/link";
-import Image from "next/image";
 
 const BlogPage = async () => {
   const data = await api.article.getAllPublished({ page: 0 });
