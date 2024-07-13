@@ -69,8 +69,9 @@ export default function Write() {
   };
 
   const [submitStatus, setSubmitStatus] = useState(false);
+  const utils = api.useUtils();
   const createArticle = api.article.create.useMutation({
-    onSuccess: () => {
+    onSuccess: async () => {
       setSubmitStatus(false);
       form.reset();
       setArticleContent("");
@@ -82,6 +83,7 @@ export default function Write() {
           </div>
         ),
       });
+      await utils.article.getAllPublished.invalidate();
     },
     onError: (err) => {
       setSubmitStatus(false);
