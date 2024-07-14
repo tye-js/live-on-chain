@@ -21,7 +21,7 @@ export const articleRouter = createTRPCRouter({
       // simulate a slow db call
       // await new Promise((resolve) => setTimeout(resolve, 3000));
       const { title, description, content, status } = input;
-      const slugName = title.replace(":", " ");
+      const slugName = title.replace(":", " ").replace("+", " ");
 
       return ctx.db.article.create({
         data: {
@@ -46,6 +46,19 @@ export const articleRouter = createTRPCRouter({
         orderBy: { createdAt: "desc" },
         where: { slug_name: input.slug_name },
         include: { createdBy: true },
+      });
+    }),
+  getMetaDataForSeo: publicProcedure
+    .input(
+      z.object({
+        slug_name: z.string(),
+      }),
+    )
+    .query(({ ctx, input }) => {
+      return ctx.db.article.findFirst({
+        select: { title: true, description: true },
+        orderBy: { createdAt: "desc" },
+        where: { slug_name: input.slug_name },
       });
     }),
 

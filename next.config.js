@@ -14,6 +14,12 @@ const config = {
         port: '',
         pathname: '/embed/avatars/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+        port: '',
+        pathname: '/**',
+      },
     ],
   },
 };

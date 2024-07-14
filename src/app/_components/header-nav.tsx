@@ -1,35 +1,55 @@
 import Link from "next/link";
-import React from "react";
 import UserSection from "./user-section";
 import Image from "next/image";
+import { Suspense } from "react";
 
 const HeaderNav = () => {
+  // 定义导航
+  const navObject = [
+    {
+      name: "首页",
+      link: "/",
+      en_name: "Home",
+    },
+    {
+      name: "文章",
+      link: "/articles",
+      en_name: "Articles",
+    },
+    {
+      name: "关于",
+      link: "/about",
+      en_name: "About",
+    },
+    {
+      name: "我的",
+      link: "/profile",
+      en_name: "Profile",
+    },
+  ];
   return (
     <header className="sticky top-0 z-50 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-20 items-center justify-between font-mono">
-        <section className="hidden md:block">
+      <section className="container flex h-20 items-center justify-between font-mono">
+        <nav className="hidden md:block">
           <Link href={"/"}>
             <Image src="/logo.svg" alt="Logo" width="32" height="32"></Image>
           </Link>
-        </section>
+        </nav>
         <nav>
-          <ul className="flex items-center justify-end space-x-4 ">
-            <li>
-              <Link href={"/"}>Home</Link>
-            </li>
-            <li>
-              <Link href={"/blog"}>Blog</Link>
-            </li>
-            <li>
-              <Link href={"/about"}>About</Link>
-            </li>
-            <li>
-              <Link href={"/profile"}>Profile</Link>
-            </li>
+          <ul className="flex items-center justify-end space-x-4  font-medium">
+            {navObject.map((item) => (
+              <li key={item.en_name}>
+                <Link href={item.link} className="hover:text-primary">
+                  {item.name}
+                </Link>
+              </li>
+            ))}
           </ul>
         </nav>
-        <UserSection />
-      </div>
+        <Suspense fallback={<p>loading...</p>}>
+          <UserSection />
+        </Suspense>
+      </section>
       <hr></hr>
     </header>
   );

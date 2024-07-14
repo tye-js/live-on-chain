@@ -4,10 +4,10 @@ import { GeistSans } from "geist/font/sans";
 
 import { TRPCReactProvider } from "@/trpc/react";
 import HeaderNav from "../_components/header-nav";
-
+import Footer from "@/app/_components/Footer";
 import { ThemeProvider } from "@/components/theme-provider";
-import Footer from "../_components/footer";
-import NextTopLoader from "nextjs-toploader";
+
+// import NextTopLoader from "nextjs-toploader";
 
 export const metadata = {
   title: {
@@ -30,7 +30,7 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body>
-        <NextTopLoader showSpinner={false} height={2} />
+        {/* <NextTopLoader showSpinner={false} height={2} /> */}
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
@@ -41,8 +41,8 @@ export default function RootLayout({
             <HeaderNav></HeaderNav>
 
             <main className="container mt-4">{children}</main>
-            <Footer></Footer>
           </TRPCReactProvider>
+          <Footer />
         </ThemeProvider>
       </body>
     </html>

@@ -9,7 +9,7 @@ type Props = {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   // fetch data
-  const data = await api.article.getOne({ slug_name: params.slug });
+  const data = await api.article.getMetaDataForSeo({ slug_name: params.slug });
 
   // optionally access and extend (rather than replace) parent metadata
   // const previousImages = (await parent).openGraph?.images || [];
@@ -26,30 +26,32 @@ const Blog = async ({ params }: Props) => {
   const data = await api.article.getOne({ slug_name: params.slug });
   return (
     <article className="prose  lg:prose-lg prose-a:font-light prose-a:text-blue-500">
-      <h1>{data?.title}</h1>
+      <h1 className="text-xl md:text-2xl">{data?.title}</h1>
       <section className="flex h-6 items-center justify-between px-4 text-center">
-        <p>{data?.createdAt.toDateString()}</p>
+        <p className="text-sm text-gray-500 md:text-base">
+          {data?.createdAt.toDateString()}
+        </p>
 
-        <span className="flex items-center gap-2">
+        <section className="flex items-center gap-2">
           {data?.createdBy.image && (
             <Image
               src={data?.createdBy.image}
               alt="Author's profile picture"
-              width={24}
-              height={24}
+              width={20}
+              height={20}
               className="rounded-full"
             ></Image>
           )}
-          <span>{data?.createdBy.name}</span>
-        </span>
+          <p className="text-sm text-gray-500 md:text-base">
+            {data?.createdBy.name}
+          </p>
+        </section>
       </section>
       {data?.content && (
         <article
-          className="font-light"
+          className="prose mt-10 font-light lg:prose-lg"
           dangerouslySetInnerHTML={{ __html: data?.content }}
-        >
-          {/* <data ></data> */}
-        </article>
+        ></article>
       )}
     </article>
   );
