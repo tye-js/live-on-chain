@@ -71,7 +71,6 @@ export const articleRouter = createTRPCRouter({
       }),
     )
     .query(({ ctx, input }) => {
-      console.log(input.status);
       if (input.status === "ALL") {
         return ctx.db.article.count({
           where: {

@@ -2,6 +2,7 @@ import Link from "next/link";
 import UserSection from "./user-section";
 import Image from "next/image";
 import { Suspense } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const HeaderNav = () => {
   // 定义导航
@@ -46,12 +47,24 @@ const HeaderNav = () => {
             ))}
           </ul>
         </nav>
-        <Suspense fallback={<p>loading...</p>}>
+        <Suspense fallback={<UserSkeleton />}>
           <UserSection />
         </Suspense>
       </section>
       <hr></hr>
     </header>
+  );
+};
+
+const UserSkeleton = () => {
+  return (
+    <section className="flex items-center space-x-2">
+      <section>
+        <Skeleton className="h-8 w-8 rounded-full" />
+      </section>
+      <Skeleton className="h-6 w-12"></Skeleton>
+      <Skeleton className="h-6 w-12"></Skeleton>
+    </section>
   );
 };
 
