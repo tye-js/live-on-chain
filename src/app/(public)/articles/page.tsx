@@ -19,16 +19,18 @@ const ArticlesList = async () => {
   return (
     <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 md:gap-8 lg:grid-cols-4">
       {data?.map((article) => (
-        <section className="p-2 outline-none" key={article.id}>
+        <section className="flex flex-col gap-2 p-2 " key={article.id}>
           <Link href={`/articles/${article.slug_name}`}>
             <div className="flex h-32 items-center justify-center overflow-hidden rounded-sm bg-gray-500 text-center ">
               Image
             </div>
           </Link>
-          <h2 className=" text-xl font-semibold">
+          <h2 className="text-base font-semibold">
             <Link href={`/articles/${article.slug_name}`}>{article.title}</Link>
           </h2>
-          <p className="text-sm font-light">{article.description}</p>
+          <p className="text-sm font-normal text-gray-600">
+            {article.description}
+          </p>
         </section>
       ))}
     </section>
